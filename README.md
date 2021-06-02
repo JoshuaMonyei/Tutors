@@ -6,7 +6,7 @@
  ## Installing:
  1. Clone the project
  ```bash 
- https://github.com/JoshuaMonyei/Tutors.git 
+ git clone https://github.com/JoshuaMonyei/Tutors.git 
 ```
 2. Install the dependencies
 ```bash
