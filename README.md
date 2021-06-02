@@ -1,6 +1,6 @@
 # Tutors
- A learning app, creating means for tutors to be easily accessible to their students
- ### Tech Stack
+ An API endpoints for a learning app, creating means for tutors to be easily accessible to their students.
+ ### Tech Stack:
  - Nodejs
  - MongoDB
 
