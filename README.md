@@ -1,8 +1,21 @@
 # Tutors
  An API endpoints for a learning app, creating means for tutors to be easily accessible to their students.
- ### Tech Stack:
+ ## Tech Stack:
  - Nodejs
  - MongoDB
+ ## Installing:
+ 1. Clone the project
+ ```bash 
+ https://github.com/JoshuaMonyei/Tutors.git 
+```
+2. Install the dependencies
+```bash
+  npm install
+```
+3. Run the server
+```bash
+  npm start
+```
 
 ![picture explaining task functionalities](https://github.com/JoshuaMonyei/Tutors/blob/24f5515bf41a7deeb1accc05adc793307a95b696/Tutor%20I.png)
 ![picture explaining task functionalities](https://github.com/JoshuaMonyei/Tutors/blob/24f5515bf41a7deeb1accc05adc793307a95b696/Tutor%20II.png)
