@@ -3,7 +3,7 @@ const {validationResult} = require('express-validator');
 const jwt = require('jsonwebtoken');
 const  bcrypt = require('bcrypt');
 const {SECRET} = process.env;
-const expiry = 86400;
+const expiry = 3600;
 
 
 // @route   GET api/auth/login
@@ -47,13 +47,15 @@ exports.loginUser = async (req, res) => {
         // else,check the password
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch) 
-            return res.status(400).json({ statusCode: 400, message: 'Email and password do not match' });
+            return res.status(400).json({message: 'Email and password do not match' });
             
         // else, there's a match, send token, payload and signed token
         const payload = {
-            user: {
-                id: user.id,
-            }
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role
         };
         jwt.sign(
             payload,
@@ -70,9 +72,7 @@ exports.loginUser = async (req, res) => {
                         firstName: user.firstName,
                         lastName: user.lastName,
                         email: user.email,
-                        userRole: user.userRole,
-                        isTutor: user.isTutor,
-                        isAdmin: user.isAdmin,
+                        role: user.role,
                     },
                     token
                 })
@@ -86,7 +86,7 @@ exports.loginUser = async (req, res) => {
 
 exports.registerNewUser = (req, res) => {
     // fetch user details from req.body
-    const {firstName, lastName, email, password, role, isAdmin, isTutor} = req.body;
+    const {firstName, lastName, email, password, role} = req.body;
     // check if the email already exists
     User.findOne({ email: email}, (err, existingUser) => {
         if (err) {
@@ -101,8 +101,6 @@ exports.registerNewUser = (req, res) => {
             email,
             password,
             role,
-            isAdmin,
-            isTutor
         })
         
         // hash users password
@@ -123,12 +121,12 @@ exports.registerNewUser = (req, res) => {
 
                 // create jwt for user
                 jwt.sign({
+                    id: user.id,
                     firstName: user.firstName,
                     lastName: user.lastName,
                     email: user.email,
                     role: user.role,
-                    isTutor: user.isTutor,
-                    isAdmin: user.isAdmin,
+                    
                     }, SECRET, {expiresIn: expiry}, (err, token) => {
                         if (err) {
                             return res.status(500).json({message: "check secret", err})
@@ -141,8 +139,7 @@ exports.registerNewUser = (req, res) => {
                                 lastName: user.lastName,
                                 email: user.email,
                                 role: user.role,
-                                isTutor: user.isTutor,
-                                isAdmin: user.isAdmin,
+                                
                             },
                             token
                         
@@ -153,6 +150,141 @@ exports.registerNewUser = (req, res) => {
         })
     })
 }
+
+exports.registerNewTutor = (req, res) => {
+    // fetch user details from req.body
+    const {firstName, lastName, email, password} = req.body;
+    // check if the email already exists
+    User.findOne({ email: email}, (err, existingUser) => {
+        if (err) {
+            return res.status(500).json({message: "something is wrong", err})
+        } 
+        if (existingUser) {
+            return res.status(400).json({message: "Email already in use"})
+        }
+        const user = new User({
+            firstName,
+            lastName,
+            email,
+            password,
+            role: "tutor",
+        })
+        
+        // hash users password
+        bcrypt.genSalt(10, (err, salt) => {
+            if (err) {
+                return res.status(500).json({err})
+            }
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                if (err) {
+                    return res.status(500).json({message: "check hash", err})
+                }
+                user.password = hash
+                user.save(err, savedUser => {
+                    if (err) {
+                        return res.status(500).json({message: "check save", err})
+                    } 
+                })
+
+                // create jwt for user
+                jwt.sign({
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    role: user.role,
+                    
+                    }, SECRET, {expiresIn: expiry}, (err, token) => {
+                        if (err) {
+                            return res.status(500).json({message: "check secret", err})
+                        }
+                    
+                        res.json({statusCode: 200,
+                            message:"You've successfully registered as a tutor.",
+                            user: {
+                                firstName: user.firstName,
+                                lastName: user.lastName,
+                                email: user.email,
+                                role: user.role,
+                                
+                            },
+                            token
+                        
+                    })
+                })
+
+            })
+        })
+    })
+}
+
+exports.registerNewStudent = (req, res) => {
+    // fetch user details from req.body
+    const {firstName, lastName, email, password} = req.body;
+    // check if the email already exists
+    User.findOne({ email: email}, (err, existingUser) => {
+        if (err) {
+            return res.status(500).json({message: "something is wrong", err})
+        } 
+        if (existingUser) {
+            return res.status(400).json({message: "Email already in use"})
+        }
+        const user = new User({
+            firstName,
+            lastName,
+            email,
+            password,
+            role: "student",
+        })
+        
+        // hash users password
+        bcrypt.genSalt(10, (err, salt) => {
+            if (err) {
+                return res.status(500).json({err})
+            }
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                if (err) {
+                    return res.status(500).json({message: "check hash", err})
+                }
+                user.password = hash
+                user.save(err, savedUser => {
+                    if (err) {
+                        return res.status(500).json({message: "check save", err})
+                    } 
+                })
+
+                // create jwt for user
+                jwt.sign({
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    role: user.role,
+                    
+                    }, SECRET, {expiresIn: expiry}, (err, token) => {
+                        if (err) {
+                            return res.status(500).json({message: "check secret", err})
+                        }
+                    
+                        res.json({statusCode: 200,
+                            message:"You've successfully registered as a tutor.",
+                            user: {
+                                firstName: user.firstName,
+                                lastName: user.lastName,
+                                email: user.email,
+                                role: user.role,
+                                
+                            },
+                            token
+                        
+                    })
+                })
+
+            })
+        })
+    })
+}
+
 
 exports.fetchTutors = async (req, res) => {
     try {
@@ -165,7 +297,10 @@ exports.fetchTutors = async (req, res) => {
         
     
     } catch (error) {
-        return res.status(500).json({message: "Server Error", error})
+        return res.json({
+            statusCode: 401,
+            message: "Server Error",
+            error})
     }
     
 }
@@ -181,7 +316,7 @@ exports.fetchSingleTutor = async (req, res) => {
         if (!search) {
             return res.status(404).json({message: 'Tutor with the Id does not exist'})
         }
-        res.json({
+        return res.json({
             statusCode: 200,
             message: 'Tutor gotten successfully',
             search

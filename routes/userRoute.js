@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {check} = require('express-validator');
-const auth = require('../middleware/auth')
+const {authenticateUser, isAdmin, isAdminOrStudent} = require('../middleware/auth')
 // Import the router controller
 const usersController = require('../controllers/usersController');
 
@@ -12,13 +12,21 @@ router.post('/api/auth/login', [
 
 ], usersController.loginUser);
 
-router.post('/api/register', usersController.registerNewUser);
+// admin routes to register all type of users
+router.post('/api/register', authenticateUser, isAdmin, usersController.registerNewUser);
+
+// route to register as a tutor
+router.post('/api/register/tutor', usersController.registerNewTutor);
+
+// route to register as a student
+router.post('/api/register/student', usersController.registerNewStudent);
 
 // Get logged in user
-router.get('/api/auth', auth, usersController.getLoggedInUser);
+router.get('/api/auth', authenticateUser, usersController.getLoggedInUser);
 
-router.get('/api/tutors', usersController.fetchTutors);
+// GET route to fetch a single tutor
+router.get('/api/tutors', authenticateUser, isAdminOrStudent, usersController.fetchTutors);
 
-router.get('/api/tutor/:userId', usersController.fetchSingleTutor);
+router.get('/api/tutor/:userId', authenticateUser, isAdmin, usersController.fetchSingleTutor);
 
 module.exports = router;

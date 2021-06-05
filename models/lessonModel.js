@@ -6,7 +6,7 @@ const LessonSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    text: {
+    content: {
         type: String
     },
     category: {

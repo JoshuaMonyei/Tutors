@@ -9,7 +9,7 @@ exports.createSubjects = async (req, res) => {
         let check = await Category.findOne({name: req.body.category}).populate("subjects");
         const search =  check.subjects.find(({name}) => name == req.body.name)
             if (search) {
-                res.status(404).json({message: "Subject already exists in this category"})
+                return res.status(404).json({message: "Subject already exists in this category"})
             }
         //  Retrieving data from the POST request
         const subject = new Subject({
@@ -35,16 +35,12 @@ exports.fetchSubject = async (req, res) => {
     try {
         const subject = await Subject.findOne({name: req.params.name}).populate("lessons");
              // return subject
-        res.json({
-            statusCode: 200,
-            message: 'Category gotten successfully',
-            subject
-        })
-        ;
+        res.status(200).json({message: 'Subject gotten successfully', subject
+        });
        
     } catch (err) {
         res.status(500).json({message: "Request not successful"});
-    }
+    }   
     
 }
 
