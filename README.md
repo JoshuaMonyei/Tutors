@@ -3,7 +3,7 @@
  ## Tech Stack:
  - Nodejs
  - MongoDB
- ## Installing:
+ ## Installation:
  1. Clone the project
  ```bash 
  git clone https://github.com/JoshuaMonyei/Tutors.git 
